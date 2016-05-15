@@ -2,13 +2,14 @@
 #include <opencv2/opencv.hpp>
 #include <cassert>
 #include <iostream>
-
+#include <algorithm>
 
 const char  * WINDOW_NAME  = "Face Tracker";
 const int CASCADE_NAME_LEN = 2048;
 char    CASCADE_NAME[CASCADE_NAME_LEN] = "haarcascade_frontalface_alt2.xml";
 
 using namespace std;
+using namespace cv;
 
 int main (int argc, char * const argv[])
 {
@@ -53,6 +54,8 @@ int main (int argc, char * const argv[])
 
         double maxR = 0;
         CvPoint maxP;
+        maxP.x = 0;
+        maxP.y = 0;
         for (int i = 0; i < (faces ? faces->total : 0); i++)
         {
             CvRect* r = (CvRect*) cvGetSeqElem (faces, i);
@@ -62,6 +65,7 @@ int main (int argc, char * const argv[])
             center.y = cvRound((r->y + r->height*0.5)*scale);
             radius = cvRound((r->width + r->height)*0.25*scale);
 
+            //filter other smaller circles
             if (radius > maxR)
             {
             	maxR = radius;
@@ -70,7 +74,27 @@ int main (int argc, char * const argv[])
             //cvCircle (draw_image, center, radius, CV_RGB(0,255,0), 3, 8, 0 );
         }
 
-        cvCircle (draw_image, maxP, maxR, CV_RGB(0,255,0), 3, 8, 0 );
+        if ((faces ? faces->total : 0) > 0) {
+			
+			cvCircle (draw_image, maxP, maxR, CV_RGB(0,255,0), 3, 8, 0 );
+    
+            Mat image(current_frame, 0);
+            int min_x = (maxP.x - maxR > 0) ? (maxP.x - maxR) : 0;
+            int min_y = (maxP.y - maxR > 0) ? (maxP.y - maxR) : 0;
+            min_x = image.cols - min_x - maxR * 2;
+    
+            Mat src(image, Rect(min_x, min_y, maxR * 2, maxR * 2));
+
+            resize(src, src, Size(192, 168));
+
+            imshow("Flip", src);
+
+            //add your recognition here... src is the face
+            
+        }
+
+        //add your 
+        //cvRectangle( draw_image, CvPoint(), CvPoint pt2, CV_RGB(0,255,0), 3, 8, 0);
         // just show the image
         cvShowImage (WINDOW_NAME, draw_image);
 
@@ -83,3 +107,6 @@ int main (int argc, char * const argv[])
     // be nice and return no error
     return 0;
 }
+
+
+
