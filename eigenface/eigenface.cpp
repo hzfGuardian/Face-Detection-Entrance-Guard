@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include "eigenface.h"
 using namespace std;
 using namespace cv;
 #define DEBUG 0
@@ -26,15 +27,13 @@ void Mat2Line(Mat &src, Mat &dst)
 		dst.at<T1>(0, x*src.cols + y) = src.at<T2>(x, y);
 	return;
 }
-string EigenFace(Mat &d)
+vector<Mat> origin;//store all the ordinates of the trained faces
+Mat average,Max_evect;
+void initEigenFace()
 {
 	string path, model;
-	string pic_name;
-	int FaceFind = 0;
 	string pathNow;//read all the faces
 	Mat temp;
-	vector<Mat> origin;//store all the ordinates of the trained faces
-	Mat average,Max_evect;
 	FileStorage fs;
 	fs.open(model.c_str(), FileStorage::READ);
 	fs["average_Matrix"] >> average;
@@ -49,6 +48,10 @@ string EigenFace(Mat &d)
 		//cout << temp;
 		origin.push_back(temp);
 	}
+
+}
+string EigenFace(Mat &d)
+{
 	//Mat d=imread(pic_name.c_str());
 	cvtColor(d, d, CV_BGR2GRAY);
 	equalizeHist(d, d);
