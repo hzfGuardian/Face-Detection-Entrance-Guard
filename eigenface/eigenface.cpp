@@ -1,12 +1,4 @@
-#include "opencv2/opencv.hpp"
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include "eigenface.h"
-using namespace std;
-using namespace cv;
+#include"eigenface.h"
 #define DEBUG 0
 #define rows_of_avg 192
 #define cols_of_avg 168
@@ -33,6 +25,7 @@ void initEigenFace()
 {
 	string path, model;
 	string pathNow;//read all the faces
+	model="model";
 	Mat temp;
 	FileStorage fs;
 	fs.open(model.c_str(), FileStorage::READ);
@@ -86,7 +79,7 @@ string EigenFace(Mat &d)
 		}
 	}
 
-	cout << fa << endl;
+	//cout << fa << endl;
 	char result[100];
 	sprintf(result,"name %02d.png", fa);
 	string ans=result;

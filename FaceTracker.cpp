@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include <algorithm>
-
+#include "eigenface/eigenface.h"
 const char  * WINDOW_NAME  = "Face Tracker";
 const int CASCADE_NAME_LEN = 2048;
 char    CASCADE_NAME[CASCADE_NAME_LEN] = "haarcascade_frontalface_alt2.xml";
@@ -21,7 +21,7 @@ int main (int argc, char * const argv[])
     CvHaarClassifierCascade* cascade = (CvHaarClassifierCascade*) cvLoad (CASCADE_NAME, 0, 0, 0);
     CvMemStorage* storage = cvCreateMemStorage(0);
     assert (storage);
-
+    initEigenFace();
     // you do own an iSight, don't you ?!?
     if (! camera)
         abort ();
@@ -75,25 +75,26 @@ int main (int argc, char * const argv[])
         }
 
         if ((faces ? faces->total : 0) > 0) {
-			
+
 			cvCircle (draw_image, maxP, maxR, CV_RGB(0,255,0), 3, 8, 0 );
-    
+
             Mat image(current_frame, 0);
             int min_x = (maxP.x - maxR > 0) ? (maxP.x - maxR) : 0;
             int min_y = (maxP.y - maxR > 0) ? (maxP.y - maxR) : 0;
             min_x = image.cols - min_x - maxR * 2;
-    
+
             Mat src(image, Rect(min_x, min_y, maxR * 2, maxR * 2));
 
             resize(src, src, Size(192, 168));
 
             imshow("Flip", src);
-
             //add your recognition here... src is the face
-            
+            string res=EigenFace(src);
+            if (res=="name 58.png") printf("open the door!\n");
+            else printf("You can't go in!\n");
         }
 
-        //add your 
+        //add your
         //cvRectangle( draw_image, CvPoint(), CvPoint pt2, CV_RGB(0,255,0), 3, 8, 0);
         // just show the image
         cvShowImage (WINDOW_NAME, draw_image);
@@ -107,6 +108,3 @@ int main (int argc, char * const argv[])
     // be nice and return no error
     return 0;
 }
-
-
-
